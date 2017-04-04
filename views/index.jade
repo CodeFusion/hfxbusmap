@@ -1,0 +1,11 @@
+extends layout
+
+block content
+    h1= title
+    p Welcome to #{title}
+    div#map
+    div= result
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js')
+    script(src='/javascripts/mappage.js')
+    script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyDMxSnCLHHtxHEVNJ12HKAJWVqBQpSIxKQ&callback=initMap')
+
