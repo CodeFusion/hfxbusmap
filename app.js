@@ -16,7 +16,7 @@ var debug = require('./routes/debug');
 
 // OpenShift variables
 app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3000);
-app.set('ip', process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1");
+app.set('ip', process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0");
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -74,7 +74,7 @@ io.on('connection', function(socket){
 });
 
 http.listen(app.get('port'), app.get('ip'), function(){
-    console.log('listening on 3000');
+    console.log('listening');
 });
 
 function getLatestPositions(callback){
