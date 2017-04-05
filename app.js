@@ -14,6 +14,10 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var debug = require('./routes/debug');
 
+// OpenShift variables
+app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3000);
+app.set('ip', process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1");
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -69,7 +73,7 @@ io.on('connection', function(socket){
     });
 });
 
-http.listen(80, function(){
+http.listen(app.get('port'), app.get('ip'), function(){
     console.log('listening on 3000');
 });
 
