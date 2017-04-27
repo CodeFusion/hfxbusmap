@@ -36,6 +36,7 @@ app.use('/users', users);
 
 var db = require('./db.js');
 var conn;
+var lastUpdate = 0;
 
 //establish connection to db
 if(!(conn = db.get()))
@@ -73,18 +74,37 @@ io.on('connection', function(socket){
     });
 });
 
+setInterval(sendPositionUpdate, 10000);
+
 http.listen(app.get('port'), app.get('ip'), function(){
     console.log('listening');
 });
 
 function getLatestPositions(callback){
-    conn.query('SELECT vehicle_id as vid, position_latitude as lat, position_longitude as lng FROM vehicle_positions WHERE timestamp = (SELECT timestamp ' +
-        'FROM vehicle_positions ORDER BY timestamp DESC LIMIT 1)', function(err, result){
-        if(err){
-            callback(err, null);
-        }else
-            callback(null, result);
+    conn.query('SELECT timestamp FROM vehicle_positions ORDER BY timestamp DESC LIMIT 1', function(err, result){
+        if(!err && result[0].timestamp > lastUpdate){
+            lastUpdate = Date.now();
+            conn.query('SELECT vehicle_id as vid, position_latitude as lat, position_longitude as lng FROM vehicle_positions WHERE timestamp = (SELECT timestamp ' +
+                'FROM vehicle_positions ORDER BY timestamp DESC LIMIT 1)', function(err, result){
+                if(err){
+                    callback(err, null);
+                }else
+                    callback(null, result);
+            });
+        }else if(err){
+
+        }
     });
+}
+
+function sendPositionUpdate(){
+    getLatestPositions(function(err, result){
+        if(!err)
+            io.emit('position-update', result);
+        else
+            io.emit('error', err);
+    });
+
 }
 
 module.exports = app;
