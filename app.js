@@ -82,8 +82,9 @@ http.listen(app.get('port'), app.get('ip'), function(){
 
 function getLatestPositions(callback){
     conn.query('SELECT timestamp FROM vehicle_positions ORDER BY timestamp DESC LIMIT 1', function(err, result){
-        if(!err && result[0].timestamp > lastUpdate){
-            lastUpdate = Date.now();
+        var dbTimestamp = new Date(Date.parse(result[0].timestamp));
+        if(!err && dbTimestamp > lastUpdate){
+            lastUpdate = dbTimestamp;
             conn.query('SELECT vehicle_id as vid, position_latitude as lat, position_longitude as lng FROM vehicle_positions WHERE timestamp = (SELECT timestamp ' +
                 'FROM vehicle_positions ORDER BY timestamp DESC LIMIT 1)', function(err, result){
                 if(err){
